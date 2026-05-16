@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 public class HistoryEntry {
     private Integer id;
     private Integer userId;
+    private Integer tournamentId;
     private int count;
     private int duration;
-    private Integer tournamentId;
+    private LocalDateTime recordedAt;
 }

@@ -13,4 +13,5 @@ public class Tournament {
     private Integer id;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private TournamentState state;
 }

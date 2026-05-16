@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: seb-db
+    environment:
+      POSTGRES_DB: seb_project
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - seb_pgdata:/var/lib/postgresql/data
+
+volumes:
+  seb_pgdata:
