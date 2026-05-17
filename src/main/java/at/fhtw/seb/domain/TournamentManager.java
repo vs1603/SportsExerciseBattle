@@ -24,7 +24,7 @@ public class TournamentManager {
         this.userRepo = userRepo;
     }
 
-    public HistoryEntry addEntry(int userId, int count, int duration) {
+    public HistoryEntry addEntry(int userId, String name, int count, int duration) {
         LocalDateTime now = LocalDateTime.now();
 
         // Close any expired running tournament before deciding
@@ -35,11 +35,10 @@ public class TournamentManager {
         if (tournament == null)
             tournament = startNewTournament(now);
 
-        HistoryEntry entry = new HistoryEntry(
-                null, userId, tournament.getId(), count, duration, now);
+        HistoryEntry entry = new HistoryEntry(null, userId, tournament.getId(), name, count, duration, now);
         HistoryEntry saved = historyRepo.save(entry);
 
-        System.out.printf("[Tournament #%d] User %d did x%d push-ups in %ds\n",
+        System.out.printf("[Tournament #%d] User %d did %d push-ups in %ds\n",
                 tournament.getId(), userId, count, duration);
 
         return saved;

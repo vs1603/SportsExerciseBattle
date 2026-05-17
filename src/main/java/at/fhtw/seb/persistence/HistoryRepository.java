@@ -22,6 +22,7 @@ public class HistoryRepository implements Repository<HistoryEntry> {
                                      id                  SERIAL PRIMARY KEY,
                                      user_id             INT REFERENCES users(id) ON DELETE CASCADE,
                                      tournament_id       INT REFERENCES tournaments(id),
+                                     name                VARCHAR(100) NOT NULL,
                                      count               INT NOT NULL,
                                      duration            INT NOT NULL,
                                      recorded_at         TIMESTAMP NOT NULL DEFAULT NOW()
@@ -40,8 +41,8 @@ public class HistoryRepository implements Repository<HistoryEntry> {
     @Override
     public HistoryEntry save(HistoryEntry entry) {
         final String sql =
-                "INSERT INTO history (user_id, tournament_id, count, duration, recorded_at) " +
-                        "VALUES (?, ?, ?, ?, ?)";
+                "INSERT INTO history (user_id, tournament_id, name, count, duration, recorded_at) " +
+                        "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -52,9 +53,10 @@ public class HistoryRepository implements Repository<HistoryEntry> {
             } else {
                 ps.setNull(2, Types.INTEGER);
             }
-            ps.setInt(3, entry.getCount());
-            ps.setInt(4, entry.getDuration());
-            ps.setTimestamp(5, Timestamp.valueOf(entry.getRecordedAt()));
+            ps.setString(3, entry.getName());
+            ps.setInt(4, entry.getCount());
+            ps.setInt(5, entry.getDuration());
+            ps.setTimestamp(6, Timestamp.valueOf(entry.getRecordedAt()));
             ps.executeUpdate();
 
             try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -85,6 +87,7 @@ public class HistoryRepository implements Repository<HistoryEntry> {
                     rs.getInt("id"),
                     rs.getInt("user_id"),
                     rs.getObject("tournament_id", Integer.class),
+                    rs.getString("name"),
                     rs.getInt("count"),
                     rs.getInt("duration"),
                     rs.getTimestamp("recorded_at").toLocalDateTime()
@@ -108,6 +111,7 @@ public class HistoryRepository implements Repository<HistoryEntry> {
                         rs.getInt("id"),
                         rs.getInt("user_id"),
                         rs.getObject("tournament_id", Integer.class),
+                        rs.getString("name"),
                         rs.getInt("count"),
                         rs.getInt("duration"),
                         rs.getTimestamp("recorded_at").toLocalDateTime()
@@ -134,6 +138,7 @@ public class HistoryRepository implements Repository<HistoryEntry> {
                         rs.getInt("id"),
                         rs.getInt("user_id"),
                         rs.getObject("tournament_id", Integer.class),
+                        rs.getString("name"),
                         rs.getInt("count"),
                         rs.getInt("duration"),
                         rs.getTimestamp("recorded_at").toLocalDateTime()
@@ -158,6 +163,7 @@ public class HistoryRepository implements Repository<HistoryEntry> {
                         rs.getInt("id"),
                         rs.getInt("user_id"),
                         rs.getObject("tournament_id", Integer.class),
+                        rs.getString("name"),
                         rs.getInt("count"),
                         rs.getInt("duration"),
                         rs.getTimestamp("recorded_at").toLocalDateTime()

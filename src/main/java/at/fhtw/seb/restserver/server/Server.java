@@ -3,6 +3,11 @@ package at.fhtw.seb.restserver.server;
 import at.fhtw.seb.persistence.HistoryRepository;
 import at.fhtw.seb.persistence.TournamentRepository;
 import at.fhtw.seb.persistence.UserRepository;
+import at.fhtw.seb.domain.*;
+import at.fhtw.seb.persistence.*;
+import at.fhtw.seb.presentation.handler.*;
+import at.fhtw.seb.presentation.router.*;
+import at.fhtw.seb.service.*;
 import com.sun.net.httpserver.HttpServer;
 import org.postgresql.ds.PGSimpleDataSource;
 
@@ -25,24 +30,35 @@ public class Server {
         TournamentRepository tournamentRepo = new TournamentRepository(ds);
         HistoryRepository historyRepo = new HistoryRepository(ds);
 
-//        // Business / domain
-//        MediaManager manager = new MediaManager(repo);
-//
-//        // Application / service
-//        MediaService service = new MediaService(manager);
-//
-//        // Presentation
-//        MediaRequestHandler requestHandler = new MediaRequestHandler(service);
-//        MediaRouter router = new MediaRouter(requestHandler);
-//        MediaHttpHandler httpHandler = new MediaHttpHandler(router);
-//
-//        // contexts:
-//        // /media      -> list & create
-//        // /media/{id} -> get & delete & update
-//        server.createContext("/media", httpHandler);
+        // Business / domain
+        TokenManager tokenManager = new TokenManager();
+        UserManager userManager = new UserManager(userRepo, tokenManager);
+        TournamentManager tournamentManager =
+                new TournamentManager(tournamentRepo, historyRepo, userRepo);
+        StatsManager statsManager = new StatsManager(userRepo, historyRepo);
+
+        // Application / service
+        UserService userService = new UserService(userManager, tokenManager);
+        HistoryService historyService = new HistoryService(tournamentManager, historyRepo);
+        TournamentService tournamentService = new TournamentService(tournamentManager);
+        StatsService statsService = new StatsService(statsManager);
+
+        // Presentation
+        UserRequestHandler userHandler = new UserRequestHandler(userService);
+        HistoryRequestHandler historyHandler = new HistoryRequestHandler(historyService, userService);
+        TournamentRequestHandler tournamentHandler =
+                new TournamentRequestHandler(tournamentService, userService);
+        StatsRequestHandler statsHandler = new StatsRequestHandler(statsService, userService);
+
+        Router router = new Router(userHandler, historyHandler, statsHandler, tournamentHandler);
+        SebHttpHandler httpHandler = new SebHttpHandler(router);
+
+        // Single context "/" handles all routes; the Router dispatches internally.
+        server.createContext("/", httpHandler);
 
         server.setExecutor(null);
         server.start();
+        System.out.println("Server started on port " + port);
     }
 
     private PGSimpleDataSource buildDataSource() {

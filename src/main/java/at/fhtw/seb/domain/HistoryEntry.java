@@ -13,6 +13,7 @@ public class HistoryEntry {
     private Integer id;
     private Integer userId;
     private Integer tournamentId;
+    private String name;
     private int count;
     private int duration;
     private LocalDateTime recordedAt;

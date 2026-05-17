@@ -17,8 +17,8 @@ public class HistoryService {
         this.historyRepo = historyRepo;
     }
 
-    public HistoryEntry addEntry(int userId, int count, int duration) {
-        return tournamentManager.addEntry(userId, count, duration);
+    public HistoryEntry addEntry(int userId, String name, int count, int duration) {
+        return tournamentManager.addEntry(userId, name, count, duration);
     }
 
     public List<HistoryEntry> getHistoryForUser(int userId) {
