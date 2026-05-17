@@ -106,12 +106,31 @@ public class TournamentRepository implements Repository<Tournament> {
         return list;
     }
 
+    public Tournament findRunning() {
+        final String sql =
+                "SELECT * FROM tournaments WHERE state = 'RUNNING'";
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (!rs.next())
+                return null;
+            return new Tournament(
+                    rs.getInt("id"),
+                    rs.getTimestamp("start_time").toLocalDateTime(),
+                    rs.getTimestamp("end_time").toLocalDateTime(),
+                    TournamentState.valueOf(rs.getString("state"))
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException("Error finding running tournament", e);
+        }
+    }
+
     public Tournament markEnded(Integer id) {
         Tournament tournament = findById(id);
         if (tournament == null) {
             throw new RuntimeException("Tournament with id " + id + " does not exist");
         }
-        final String sql = "UPDATE tournament SET state = 'ENDED' WHERE id = ?";
+        final String sql = "UPDATE tournaments SET state = 'ENDED' WHERE id = ?";
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);

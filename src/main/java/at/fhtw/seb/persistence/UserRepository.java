@@ -127,7 +127,7 @@ public class UserRepository implements Repository<User> {
     @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        final String selectAll = "SELECT * FROM users ORDER BY elo DESC";
+        final String selectAll = "SELECT * FROM users";
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(selectAll)
@@ -171,6 +171,18 @@ public class UserRepository implements Repository<User> {
         }
         user.setId(id);
         return user;
+    }
+
+    public void adjustElo(int userId, int delta) {
+        final String sql = "UPDATE users SET elo = elo + ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, delta);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error adjusting ELO", e);
+        }
     }
 
     @Override
