@@ -16,6 +16,7 @@ public class TokenManager {
 
     /** Validates a token */
     public boolean isValid(String token) {
+        if (token == null) return false;
         return validTokens.containsKey(token);
     }
 

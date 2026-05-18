@@ -42,4 +42,8 @@ public class UserService {
     public boolean isTokenValid(String token) {
         return tokenManager.isValid(token);
     }
+
+    public void logout(String token) {
+        userManager.logout(token);
+    }
 }
